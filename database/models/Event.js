@@ -1,6 +1,10 @@
 const { model, Schema } = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
+// function dateValidator(value) {
+//   return this.startDate <= value;
+// }
+
 const EventsSchema = new Schema({
   organizer: {
     type: String,
@@ -11,19 +15,19 @@ const EventsSchema = new Schema({
     type: String,
     validate: {
       validator: function (arr) {
-        console.log(!arr.includes("event"));
-        return !arr.includes("event");
+        return !arr.toLowerCase().includes("event");
       },
-      message: "",
+      message: "event isnt allowed",
     },
   },
   email: {
     type: String,
-    // required: true,
+    required: true,
     match: /.+\@.+\..+/,
   },
   image: {
     type: String,
+    required: true,
   },
   numOfSeats: {
     type: Number,
@@ -32,16 +36,38 @@ const EventsSchema = new Schema({
   bookedSeats: {
     type: Number,
     default: 0,
-    max: 5,
+    validate: {
+      validator: function (value) {
+        return this.numOfSeats >= value;
+      },
+      message: "Booked seats must be less than or equal to number of seats",
+    },
   },
   startDate: {
     type: Date,
-    min: Date.now + 24 * 60 * 60 * 1000,
+    min: Date.now() + 24,
   },
   endDate: {
     type: Date,
+    format: "DD-MM-YYYY",
+    validate: {
+      validator: function (value) {
+        return this.startDate <= value;
+      },
+      message: "Start date must be earlier than end date",
+    },
   },
 });
 
 EventsSchema.plugin(uniqueValidator);
 module.exports = model("Event", EventsSchema);
+
+/* "organizer":
+"name":
+"message":
+"email":
+"numOfSeats":
+"bookedSeats":
+"startDate":
+"endDate":
+*/

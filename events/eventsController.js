@@ -11,6 +11,21 @@ exports.fetchEventsController = async (req, res) => {
   }
 };
 
+exports.fetchUpcomingEventsController = async (req, res) => {
+  try {
+    let date = req.body;
+
+    //let events = await Event.find();
+    const events = await Event.find().where("startDate").gt(date);
+    // events = events.filter((event) => event.startDate >= date);
+    console.log(events);
+
+    res.status(201).json(events);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.addEventController = async (req, res) => {
   try {
     const event = req.body;
